@@ -39,3 +39,11 @@
 
 # debug information files
 *.dwo
+/glstudy/out/*
+/glstudy/out
+/glstudy/CMakePresets.json
+/glstudy/.vs
+/OpenGL/out/*
+/OpenGL/out
+/OpenGL/.vs
+/OpenGL/CMakePresets.json
