@@ -47,3 +47,4 @@
 /OpenGL/out
 /OpenGL/.vs
 /OpenGL/CMakePresets.json
+/OpenGL/glStudy/thirdParty/lib/glfw3.lib
