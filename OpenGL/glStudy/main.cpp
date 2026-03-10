@@ -6,6 +6,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "checkError.h"
+
+#include "application/Application.h"
+
 
 using namespace std;
 
@@ -23,8 +27,10 @@ void KeyCallback(GLFWwindow* window, int key, int scanCode, int action, int mode
 	}
 }
 
+
 int main()
 {
+	app->test();
 
 	//1 初始化GLFW的基本环境
 	glfwInit();
@@ -55,15 +61,19 @@ int main()
 	}
 	
 	//设置opengl视口
-	glViewport(0, 0, 20, 20);
+	GL_CALL(glViewport(0, 0, 20, 20));
 	//设置清理颜色
-	glClearColor(0.1, 0.2, 0.3, 0);
+	GL_CALL(glClearColor(0.1, 0.2, 0.3, 0));
 	
 	//3 执行窗体循环 每次循环处理事件消息队列 -- 一帧
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();//接受并分发窗口消息
-		glClear(GL_COLOR_BUFFER_BIT);
+
+		GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+		//GL_CALL(glClear(-1));
+
+		//切换双缓存
 		glfwSwapBuffers(window);
 	}
 	//4 退出程序前做相关清理
