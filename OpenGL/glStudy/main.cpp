@@ -13,13 +13,13 @@
 
 using namespace std;
 
-void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
+void FrameBufferSizeCallback(int width, int height)
 {
 	//std::cout << "width:" << width << ",height" << height << endl;
 	glViewport(0, 0, width, height);
 }
 
-void KeyCallback(GLFWwindow* window, int key, int scanCode, int action, int mode)
+void KeyCallback(int key, int scanCode, int action, int mode)
 {
 	if (key == GLFW_KEY_W)
 	{
@@ -27,56 +27,93 @@ void KeyCallback(GLFWwindow* window, int key, int scanCode, int action, int mode
 	}
 }
 
+void prepareVBO()
+{
+	//创建一个VBO
+	GLuint vbo = 0;
+	GL_CALL(glGenBuffers(1, &vbo));
+
+	//销毁一个vbo
+	GL_CALL(glDeleteBuffers(1, &vbo));
+
+	//创建n个vbo
+	GLuint vboArr[] = {0,0,0};
+	GL_CALL(glGenBuffers(3, vboArr));
+
+	//销毁n个vbo
+	GL_CALL(glDeleteBuffers(3, vboArr));
+
+}
+
+void prepare()
+{
+	float vertices[] =
+	{
+		-0.5f,-0.5f,0.0f,
+		0.5f,-0.5f,0.0f,
+		0.0f,0.5f,0.0f
+	};
+	//生成一个VBO
+	GLuint vbo = 0;
+	GL_CALL(glGenBuffers(1, &vbo));
+	//绑定当前VBO到opengl状态机的当前vbo插槽上
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+	//向vbo传输数据，也是在开辟显存
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+}
+
+void prepareSingleBuffers()
+{
+	float positions[] =
+	{
+		-0.5f,-0.5f,0.0f,
+		0.5f,-0.5f,0.0f,
+		0.0f,0.5f,0.0f
+	};
+	float colors[] =
+	{
+		1.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,
+		0.0f,0.0f,1.0f
+	};
+
+	GLuint posVbo = 0;
+	GL_CALL(glGenBuffers(1, &posVbo));
+	GLuint colorVbo = 0;
+	GL_CALL(glGenBuffers(1, &colorVbo));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, colorVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW));
+}
 
 int main()
 {
-	app->test();
-
-	//1 初始化GLFW的基本环境
-	glfwInit();
-	//1.1 设置OpenGL主版本号和次版本号
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	//1.2 设置OpenGL启用核心模式(非立即渲染模式)
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	//2 创建窗体对象
-	GLFWwindow *window = glfwCreateWindow(800, 600, "OpenGLWindow", nullptr, nullptr);
-	if (window == nullptr)
-		return 0;
-
-	glfwMakeContextCurrent(window);//设置当前窗体为opengl绘制的舞台
-
-	//订阅窗体大小变化事件
-	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
-
-	//订阅键盘按下事件
-	glfwSetKeyCallback(window, KeyCallback);
-
-	//使用glad加载所有当前版本opengl的函数
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!app->init(800, 600))
 	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-	
+
+	app->setResizeCallback(FrameBufferSizeCallback);
+
+	app->setKeyCallback(KeyCallback);
+
 	//设置opengl视口
 	GL_CALL(glViewport(0, 0, 20, 20));
 	//设置清理颜色
 	GL_CALL(glClearColor(0.1, 0.2, 0.3, 0));
 	
 	//3 执行窗体循环 每次循环处理事件消息队列 -- 一帧
-	while (!glfwWindowShouldClose(window))
+	while (app->update())
 	{
-		glfwPollEvents();//接受并分发窗口消息
-
 		GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 		//GL_CALL(glClear(-1));
+		
 
-		//切换双缓存
-		glfwSwapBuffers(window);
+		//渲染操作
 	}
-	//4 退出程序前做相关清理
-	glfwTerminate();
-	return 0;
+
+	return app->destroy() ? 0 : -1;
 }
