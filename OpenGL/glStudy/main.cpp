@@ -89,6 +89,90 @@ void prepareSingleBuffers()
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW));
 }
 
+void prepareSingBuffers1()
+{
+	float positions[] =
+	{
+		-0.5f,-0.5f,0.0f,
+		0.5f,-0.5f,0.0f,
+		0.0f,0.5f,0.0f
+	};
+	float colors[] =
+	{
+		1.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,
+		0.0f,0.0f,1.0f
+	};
+
+	GLuint posVbo = 0;
+	glGenBuffers(1, &posVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+	GLuint colorsVbo = 0;
+	glGenBuffers(1, &colorsVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, colorsVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+
+	GLuint vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER,posVbo);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, colorsVbo);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	glBindVertexArray(0);
+}
+
+void prepareInterleavedBuffer()
+{
+	float vertices[] =
+	{
+		-0.5f,-0.5f,0.0f, 1.0f,0.0f,0.0f,
+		0.5f,-0.5f,0.0f, 0.0f,1.0f,0.0f,
+		0.0f,0.5f,0.0f, 0.0f,0.0f,1.0f
+	};
+	GLuint vbo = 0;
+	GL_CALL(glGenBuffers(1, &vbo));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+}
+
+void prepareInterleavedBuffer1()
+{
+	float vertices[] =
+	{
+		-0.5f,-0.5f,0.0f, 1.0f,0.0f,0.0f,
+		0.5f,-0.5f,0.0f, 0.0f,1.0f,0.0f,
+		0.0f,0.5f,0.0f, 0.0f,0.0f,1.0f
+	};
+
+	GLuint vbo = 0;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	GLuint vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	glBindVertexArray(0);
+}
+
 int main()
 {
 	if (!app->init(800, 600))
