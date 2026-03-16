@@ -173,6 +173,52 @@ void prepareInterleavedBuffer1()
 	glBindVertexArray(0);
 }
 
+
+void prepareInterleavedBuffer2()
+{
+	//pos and uv
+	float vertices[] =
+	{
+		-0.5f,-0.5f,0.0f, 1.0f,0.0f,
+		0.5f,-0.5f,0.0f, 0.0f,1.0f,
+		0.0f,0.5f,0.0f, 0.0f,0.0f,
+	};
+
+	float colors[] =
+	{
+		-0.5f,-0.5f,0.0f,0.5,
+		0.5f,-0.5f,0.0f,0.5,
+		0.0f,0.5f,0.0f,0.5,
+	};
+
+	GLuint verticesVbo = 0;
+	glGenBuffers(1, &verticesVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, verticesVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	GLuint colorVbo = 0;
+	glGenBuffers(1, &colorVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+
+	GLuint vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, verticesVbo);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)3);
+
+	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
+	glBindVertexArray(0);
+}
+
 int main()
 {
 	if (!app->init(800, 600))
