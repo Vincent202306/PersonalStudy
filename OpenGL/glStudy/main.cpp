@@ -186,12 +186,18 @@ void prepareInterleavedBuffer2()
 		-0.5f,-0.5f,0.0f, 1.0f,0.0f,
 		0.5f,-0.5f,0.0f, 0.0f,1.0f,
 		0.0f,0.5f,0.0f, 0.0f,0.0f,
+		0.5f,0.5f,0.0f, 0.0f,0.0f,
+		0.8f,0.8f,0.0f, 0.0f,0.0f,
+		0.8f,0.0f,0.0f, 0.0f,0.0f,
 	};
 
 	float colors[] =
 	{
 		-0.5f,-0.5f,0.0f,0.5,
 		0.5f,-0.5f,0.0f,0.5,
+		0.0f,0.5f,0.0f,0.5,
+		0.0f,0.5f,0.0f,0.5,
+		0.0f,0.5f,0.0f,0.5,
 		0.0f,0.5f,0.0f,0.5,
 	};
 
@@ -318,6 +324,63 @@ void prepareShader()
 	glDeleteShader(fragmentShaderObj);	
 }
 
+
+void render()
+{
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+	//渲染操作
+	GL_CALL(glUseProgram(program));
+	GL_CALL(glBindVertexArray(vao));
+	//glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+	GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0)); 
+	GL_CALL(glBindVertexArray(0));
+}
+
+void prepareVao()
+{
+	//1. 准备顶点数据和索引数据
+	float positions[] =
+	{
+		-0.5f,-0.5f,0.0f,
+		0.5f,-0.5f,0.0f,
+		0.0f,0.5f,0.0f,
+		0.5f,0.5f,0.0f,
+	};
+
+	unsigned int indices[] =
+	{
+		0,1,2,
+		2,1,3
+	};
+
+	// 2.创建一个vbo，管理顶点数据的显存
+	GLuint posVbo = 0;
+	glGenBuffers(1, &posVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+	//3. 创建一个ebo，管理索引数据的显存
+	GLuint ebo = 0;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//4. 创建一个vao，管理vbo和ebo的绑定关系，管理顶点属性配置
+	vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	//5. 配置顶点属性指针，让vao知道vbo中的数据该如何解析，告诉vao我需要启用哪个顶点属性
+	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+	glBindVertexArray(0);
+}
+
 int main()
 {
 	if (!app->init(800, 600))
@@ -333,19 +396,13 @@ int main()
 	GL_CALL(glViewport(0, 0, 20, 20));
 	//设置清理颜色
 	GL_CALL(glClearColor(0.1, 0.2, 0.3, 0));
-	prepareInterleavedBuffer2();
+	//prepareInterleavedBuffer2();
+	prepareVao();
 	prepareShader();
 	//3 执行窗体循环 每次循环处理事件消息队列 -- 一帧
 	while (app->update())
 	{
-		GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
-		//GL_CALL(glClear(-1));
-		
-
-		//渲染操作
-		glUseProgram(program);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		render();	
 	}
 
 	return app->destroy() ? 0 : -1;
