@@ -3,19 +3,18 @@
 
 #include "main.h"
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
+#include "glFramework/core.h"
 #include "checkError.h"
 
 #include "application/Application.h"
+#include "glFramework/Shader.h"
 
 
 using namespace std;
 
 //全局变量vao（管理渲染数据） program（管理渲染程序）
 GLuint vao = 0;
-GLuint program = 0;
+Shader* shader = nullptr;
 
 void FrameBufferSizeCallback(int width, int height)
 {
@@ -231,101 +230,7 @@ void prepareInterleavedBuffer2()
 
 void prepareShader()
 {
-	/*const char* vertexShaderSource = R"(
-		#version 330 core
-		layout(location = 0) in vec3 aPos;
-		layout(location = 1) in vec3 aColor;
-		out vec3 ourColor;
-		void main()
-		{
-			gl_Position = vec4(aPos, 1.0);
-			ourColor = aColor;
-		}
-	)";
-	const char* fragmentShaderSource = R"(
-		#version 330 core
-		out vec4 FragColor;
-		in vec3 ourColor;
-		void main()
-		{
-			FragColor = vec4(ourColor, 1.0);
-		}
-	)";
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);*/
-
-	//1. 准备好vs fs的源代码字符串
-	const char* vertexShaderSource = "#version 460 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"layout (location = 1) in vec3 aColor;\n"
-		"out vec3 color;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"   color = vec3(aColor.x, aColor.y, aColor.z);\n"
-		"}\0";
-
-	const char* fragmentShaderSource = "#version 460 core\n"
-		"in vec3 color;\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"   FragColor = vec4(color.x, color.y, color.z, 1.0f);\n"
-		"}\0";
-
-	//2. 创建一个shader对象，告诉opengl这是一个顶点着色器对象,管理shader源码,负责编译，管理编译后的目标文件
-	GLuint vertexShaderObj = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShaderObj, 1, &vertexShaderSource, NULL);
-
-
-	//3. 创建一个shader对象，告诉opengl这是一个片段着色器对象,管理shader源码,负责编译，管理编译后的目标文件
-	GLuint fragmentShaderObj = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShaderObj, 1, &fragmentShaderSource, NULL);
-
-	int success = 0;
-	glCompileShader(vertexShaderObj);
-	glGetShaderiv(vertexShaderObj, GL_COMPILE_STATUS, &success);
-
-	if(!success)
-	{
-		char infoLog[512] = { 0 };
-		glGetShaderInfoLog(vertexShaderObj, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	glCompileShader(fragmentShaderObj);
-	glGetShaderiv(fragmentShaderObj, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		char infoLog[512] = { 0 };
-		glGetShaderInfoLog(fragmentShaderObj, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	//4. 创建一个program对象，管理shader对象,负责链接
-	program = glCreateProgram();
-	glAttachShader(program, vertexShaderObj);
-	glAttachShader(program, fragmentShaderObj);
-	glLinkProgram(program);
-	glGetProgramiv(program, GL_LINK_STATUS, &success);
-	if(!success)
-	{
-		char infoLog[512] = { 0 };
-		glGetProgramInfoLog(program, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShaderObj);
-	glDeleteShader(fragmentShaderObj);	
+	shader = new Shader("assets/shaders/vetex.glsl", "assets/shaders/fragment.glsl");
 }
 
 
@@ -334,11 +239,13 @@ void render()
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 	//渲染操作
-	GL_CALL(glUseProgram(program));
+	//GL_CALL(glUseProgram(program));
+	shader->begin();
 	GL_CALL(glBindVertexArray(vao));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 	GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0)); 
 	GL_CALL(glBindVertexArray(0));
+	shader->end();
 }
 
 void prepareVao()
@@ -418,6 +325,7 @@ int main()
 	//prepareInterleavedBuffer2();
 	prepareVao();
 	prepareShader();
+	
 	//3 执行窗体循环 每次循环处理事件消息队列 -- 一帧
 	while (app->update())
 	{

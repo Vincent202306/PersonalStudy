@@ -10,10 +10,14 @@ aux_source_directory (./ SRCS)
 aux_source_directory (./thirdParty SRCS)
 #aux_source_directory (./funcs SRCS)
 
+file(GLOB ASSETS "./assets")
+file(COPY ${ASSETS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 #include_directories 定义该项目中的头文件搜索路径 目的是为了不用在包含头文件时写全路径
 include_directories(
 	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/include
 	${CMAKE_CURRENT_SOURCE_DIR}/wrapper
+	${CMAKE_CURRENT_SOURCE_DIR}/fw
 )
 
 link_directories(
@@ -22,6 +26,7 @@ link_directories(
 
 add_subdirectory(wrapper)
 add_subdirectory(application)
+add_subdirectory(glFramework)
 
 add_definitions(-DDEBUG)
 
@@ -35,7 +40,7 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
 endif()
 
 #将funcs.lib链接到当前目标
-target_link_libraries(glStudy myFuncs glfw3.lib wrapper Application)
+target_link_libraries(glStudy myFuncs glfw3.lib wrapper Application fw)
 
 # TODO: 如有需要，请添加测试并安装目标。
 
