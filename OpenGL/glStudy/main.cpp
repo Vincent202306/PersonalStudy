@@ -267,16 +267,20 @@ void prepareShader()
 	//1. 准备好vs fs的源代码字符串
 	const char* vertexShaderSource = "#version 460 core\n"
 		"layout (location = 0) in vec3 aPos;\n"
+		"layout (location = 1) in vec3 aColor;\n"
+		"out vec3 color;\n"
 		"void main()\n"
 		"{\n"
 		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+		"   color = vec3(aColor.x, aColor.y, aColor.z);\n"
 		"}\0";
 
 	const char* fragmentShaderSource = "#version 460 core\n"
+		"in vec3 color;\n"
 		"out vec4 FragColor;\n"
 		"void main()\n"
 		"{\n"
-		"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+		"   FragColor = vec4(color.x, color.y, color.z, 1.0f);\n"
 		"}\0";
 
 	//2. 创建一个shader对象，告诉opengl这是一个顶点着色器对象,管理shader源码,负责编译，管理编译后的目标文件
@@ -345,20 +349,31 @@ void prepareVao()
 		-0.5f,-0.5f,0.0f,
 		0.5f,-0.5f,0.0f,
 		0.0f,0.5f,0.0f,
-		0.5f,0.5f,0.0f,
+		//0.5f,0.5f,0.0f,
+	};
+
+	float colors[] =
+	{
+		1.0,0.0,0.0,
+		0.0,1.0,0.0,
+		0.0,0.0,1.0
 	};
 
 	unsigned int indices[] =
 	{
 		0,1,2,
-		2,1,3
+		//2,1,3
 	};
 
 	// 2.创建一个vbo，管理顶点数据的显存
-	GLuint posVbo = 0;
+	GLuint posVbo,colorVbo = 0;
 	glGenBuffers(1, &posVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &colorVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 
 	//3. 创建一个ebo，管理索引数据的显存
 	GLuint ebo = 0;
@@ -375,6 +390,10 @@ void prepareVao()
 	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
