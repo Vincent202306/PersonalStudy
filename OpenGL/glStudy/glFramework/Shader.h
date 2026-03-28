@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include <string>
 
 class Shader
 {
@@ -15,6 +16,8 @@ public:
 	void end();
 
 	void checkShaderError(GLuint, int);
+
+	void setFloat(const std::string& name, float value);
 
 private:
 

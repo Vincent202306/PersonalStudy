@@ -103,3 +103,10 @@ void Shader::checkShaderError(GLuint target, int type)
 		break;
 	}
 }
+
+
+void Shader::setFloat(const std::string& name, float value)
+{
+	GLuint location = glGetUniformLocation(program_, name.c_str());
+	glUniform1f(location, value);
+}

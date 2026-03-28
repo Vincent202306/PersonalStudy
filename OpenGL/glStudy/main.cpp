@@ -241,6 +241,7 @@ void render()
 	//渲染操作
 	//GL_CALL(glUseProgram(program));
 	shader->begin();
+	shader->setFloat("time", glfwGetTime());
 	GL_CALL(glBindVertexArray(vao));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 	GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0)); 
