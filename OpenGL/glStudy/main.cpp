@@ -243,6 +243,8 @@ void render()
 	shader->begin();
 	shader->setFloat("time", glfwGetTime());
 	shader->setFloat("speed", 3.0);
+	float color[] = { 0.3,0.4,0.5};
+	shader->setVector3f("ucolor", color);
 	GL_CALL(glBindVertexArray(vao));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 	GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0)); 

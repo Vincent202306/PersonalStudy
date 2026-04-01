@@ -5,9 +5,12 @@ out vec3 color;
 uniform float time;
 
 uniform float speed;
+
+uniform vec3 ucolor; 
 void main()
 {
    float dx = sin(time * speed) * 0.3;
    gl_Position = vec4(aPos.x + dx, aPos.y, aPos.z, 1.0);
-   color = aColor * (cos(time) + 1.0) / 2.0;
+   //color = aColor * (cos(time) + 1.0) / 2.0;
+   color = ucolor;
 }
