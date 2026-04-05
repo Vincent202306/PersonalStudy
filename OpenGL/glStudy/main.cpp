@@ -9,12 +9,15 @@
 #include "application/Application.h"
 #include "glFramework/Shader.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "StbImage/stb_image.h"
 
 using namespace std;
 
 //全局变量vao（管理渲染数据） program（管理渲染程序）
 GLuint vao = 0;
 Shader* shader = nullptr;
+GLuint texture = 0;
 
 void FrameBufferSizeCallback(int width, int height)
 {
@@ -309,6 +312,30 @@ void prepareVao()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glBindVertexArray(0);
+}
+
+
+void prepareTexture()
+{
+	//1.stbImage 读取图片
+	int width = 0;
+	int height = 0;
+	int comp = 0;
+	// 设置stbi库加载图片的加载模式反转y轴
+	stbi_set_flip_vertically_on_load(true);
+
+	stbi_uc* data = stbi_load("assets/texture/raw.png", &width, &height, &comp, STBI_rgb_alpha);
+	//2.生成纹理对象且激活单元并绑定
+	glGenTextures(1, &texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	//3.传输纹理数据,开辟显存
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+
+	//释放从cpu端内存数据
+	stbi_image_free(data);
 }
 
 int main()
