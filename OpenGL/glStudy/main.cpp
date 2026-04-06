@@ -15,7 +15,9 @@ using namespace std;
 //全局变量vao（管理渲染数据） program（管理渲染程序）
 GLuint vao = 0;
 Shader* shader = nullptr;
-Texture* texture = nullptr;
+Texture* grassTexture = nullptr;
+Texture* landTexture = nullptr;
+Texture* noiseTexture = nullptr;
 
 void FrameBufferSizeCallback(int width, int height)
 {
@@ -242,8 +244,10 @@ void render()
 	//GL_CALL(glUseProgram(program));
 	shader->begin();
 	
-	shader->setInt("sampler", 0);
-	shader->setFloat("time", glfwGetTime());
+	shader->setInt("grassSampler", 0);
+	shader->setInt("landSampler", 1);
+	shader->setInt("noiseSampler", 2);
+	//shader->setFloat("time", glfwGetTime());
 	/*float color[] = { 0.3,0.4,0.5};
 	shader->setVector3f("ucolor", color);*/
 	GL_CALL(glBindVertexArray(vao));
@@ -267,9 +271,9 @@ void prepareVao()
 	float uvs[] =
 	{
 		0.0f,0.0f,
-		2.0f,0.0f,
+		1.0f,0.0f,
 		0.0f,1.0f,
-		2.0f,1.0f,
+		1.0f,1.0f,
 	};
 
 	float colors[] =
@@ -332,7 +336,9 @@ void prepareVao()
 
 void prepareTexture()
 {
-	texture = new Texture("assets/textures/raw.png", (unsigned int)0);
+	grassTexture = new Texture("assets/textures/grass.jpg", (unsigned int)0);
+	landTexture = new Texture("assets/textures/land.jpg", (unsigned int)1);
+	noiseTexture = new Texture("assets/textures/noise.jpg", (unsigned int)2);
 }
 
 int main()
