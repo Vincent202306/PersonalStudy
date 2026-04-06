@@ -23,6 +23,8 @@ public:
 
 	void setVector3f(const std::string& name, float* vec);
 
+	void setInt(const std::string& name, int value);
+
 private:
 
 	GLuint program_ = 0;

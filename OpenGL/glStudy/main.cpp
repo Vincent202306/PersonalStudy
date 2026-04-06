@@ -246,8 +246,10 @@ void render()
 	shader->begin();
 	shader->setFloat("time", glfwGetTime());
 	shader->setFloat("speed", 3.0);
-	float color[] = { 0.3,0.4,0.5};
-	shader->setVector3f("ucolor", color);
+
+	shader->setInt("sampler", 0);
+	/*float color[] = { 0.3,0.4,0.5};
+	shader->setVector3f("ucolor", color);*/
 	GL_CALL(glBindVertexArray(vao));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 	GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0)); 
@@ -266,6 +268,13 @@ void prepareVao()
 		//0.5f,0.5f,0.0f,
 	};
 
+	float uvs[] =
+	{
+		0.0f,0.0f,
+		1.0f,0.0f,
+		0.5f,1.0f,
+	};
+
 	float colors[] =
 	{
 		1.0,0.0,0.0,
@@ -280,10 +289,14 @@ void prepareVao()
 	};
 
 	// 2.创建一个vbo，管理顶点数据的显存
-	GLuint posVbo,colorVbo = 0;
+	GLuint posVbo,colorVbo,uvVbo = 0;
 	glGenBuffers(1, &posVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &uvVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &colorVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
@@ -309,6 +322,10 @@ void prepareVao()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 
+	glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(2);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glBindVertexArray(0);
@@ -324,7 +341,7 @@ void prepareTexture()
 	// 设置stbi库加载图片的加载模式反转y轴
 	stbi_set_flip_vertically_on_load(true);
 
-	stbi_uc* data = stbi_load("assets/texture/raw.png", &width, &height, &comp, STBI_rgb_alpha);
+	stbi_uc* data = stbi_load("assets/textures/raw.png", &width, &height, &comp, STBI_rgb_alpha);
 	//2.生成纹理对象且激活单元并绑定
 	glGenTextures(1, &texture);
 	glActiveTexture(GL_TEXTURE0);
@@ -336,6 +353,14 @@ void prepareTexture()
 
 	//释放从cpu端内存数据
 	stbi_image_free(data);
+
+	//4.设置纹理的过滤方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	//5.设置纹理包裹方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//v
 }
 
 int main()
@@ -355,6 +380,7 @@ int main()
 	GL_CALL(glClearColor(0.1, 0.2, 0.3, 0));
 	//prepareInterleavedBuffer2();
 	prepareVao();
+	prepareTexture();
 	prepareShader();
 	
 	//3 执行窗体循环 每次循环处理事件消息队列 -- 一帧
