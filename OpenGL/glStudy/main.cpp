@@ -236,7 +236,6 @@ void prepareShader()
 	shader = new Shader("assets/shaders/vetex.glsl", "assets/shaders/fragment.glsl");
 }
 
-
 void render()
 {
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
@@ -244,10 +243,9 @@ void render()
 	//渲染操作
 	//GL_CALL(glUseProgram(program));
 	shader->begin();
-	shader->setFloat("time", glfwGetTime());
-	shader->setFloat("speed", 3.0);
-
+	
 	shader->setInt("sampler", 0);
+	shader->setFloat("time", glfwGetTime());
 	/*float color[] = { 0.3,0.4,0.5};
 	shader->setVector3f("ucolor", color);*/
 	GL_CALL(glBindVertexArray(vao));
@@ -264,28 +262,30 @@ void prepareVao()
 	{
 		-0.5f,-0.5f,0.0f,
 		0.5f,-0.5f,0.0f,
-		0.0f,0.5f,0.0f,
-		//0.5f,0.5f,0.0f,
+		-0.5f,0.5f,0.0f,
+		0.5f,0.5f,0.0f,
 	};
 
 	float uvs[] =
 	{
 		0.0f,0.0f,
-		1.0f,0.0f,
-		0.5f,1.0f,
+		2.0f,0.0f,
+		0.0f,1.0f,
+		2.0f,1.0f,
 	};
 
 	float colors[] =
 	{
 		1.0,0.0,0.0,
 		0.0,1.0,0.0,
+		0.0,0.0,1.0,
 		0.0,0.0,1.0
 	};
 
 	unsigned int indices[] =
 	{
 		0,1,2,
-		//2,1,3
+		2,1,3
 	};
 
 	// 2.创建一个vbo，管理顶点数据的显存
