@@ -14,13 +14,27 @@ Texture::Texture(const std::string& path, unsigned int unit) :path_(path), unit_
 	glBindTexture(GL_TEXTURE_2D, texture_);
 
 	//3.传输纹理数据,开辟显存
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,GL_RGBA, GL_UNSIGNED_BYTE, data);
+	int width = width_;
+	int height = height_;
+	for (int level = 0; true; ++level)
+	{
+		glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+		if (width == 1 && height == 1)
+		{
+			break;
+		}
+
+		width = width > 1 ? width / 2 : 1;
+		height = height > 1 ? height / 2 : 1;
+	}
+	
 
 	stbi_image_free(data);//释放从cpu端内存数据
 
 	//4.设置纹理的过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 
 	//5.设置纹理包裹方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//u方向

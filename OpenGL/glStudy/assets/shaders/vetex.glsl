@@ -6,15 +6,10 @@ out vec3 color;
 out vec2 uv;
 uniform float time;
 
-//uniform float speed;
-
-//uniform vec3 ucolor; 
-
 void main()
 {
-   float dx = time * 0.3;
-   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-   //color = aColor * (cos(time) + 1.0) / 2.0;
-   //color = ucolor;
-   uv = vec2(aUV.x + dx,aUV.y);
+   float scale = 1/time;
+   vec3 targetPos = aPos * scale;
+   gl_Position = vec4(targetPos, 1.0);
+   uv = aUV;
 }
