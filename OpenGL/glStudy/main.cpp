@@ -244,6 +244,8 @@ void render()
 	
 	shader->setInt("goKuSampler", 0);
 	shader->setFloat("time", glfwGetTime());
+	shader->setFloat("width", texture->getWidth());
+	shader->setFloat("height", texture->getHeight());
 	GL_CALL(glBindVertexArray(vao));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 	GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0)); 
